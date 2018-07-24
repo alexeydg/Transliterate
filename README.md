@@ -7,7 +7,7 @@
 
 ### Установка:
 ```
-composer require elforastero/transliterate
+composer require alexeydg/transliterate
 ```
 
 ```php
