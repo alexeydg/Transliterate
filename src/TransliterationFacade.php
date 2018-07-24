@@ -1,6 +1,6 @@
 <?php
 
-namespace ElForastero\Transliterate;
+namespace alexeydg\Transliterate;
 
 use Illuminate\Support\Facades\Facade;
 

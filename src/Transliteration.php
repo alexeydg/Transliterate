@@ -1,6 +1,6 @@
 <?php
 
-namespace ElForastero\Transliterate;
+namespace alexeydg\Transliterate;
 
 /**
  * Feel free to change it.
