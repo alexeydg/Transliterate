@@ -13,9 +13,9 @@ class Transliteration
 {
     /**
      * Default transliteration map
-     * @var string common|gost2000
+     * @var string oldschool|common|gost2000
      */
-    private static $map = 'common';
+    private static $map = 'oldschool';
 
     /**
      * Default transliteration method
@@ -25,15 +25,15 @@ class Transliteration
 
     /**
      * Lowercase string or not
-     * @var bool
+     * @var string null|lowercase|uppercase|ucfirst
      */
-    private static $lowercase = false;
+    private static $transformate_text = null;
 
 
     /**
      * @param       $string
      * @param array $params Массив с параметрами.
-     *                      lowercase => true
+     *                      transformate_text => null
      *                      type => url | filename Подчеркивания или дефисы
      *                      map => gost2000 Таблица транслитерации ГОСТ 2000. По умолчанию используется общепринятая.
      * @return mixed|string
@@ -41,7 +41,6 @@ class Transliteration
     public static function make($string, array $params = [])
     {
         self::parseParameters($params);
-
         $map = self::getTransliterationMap();
         $chars = implode('', array_keys($map));
         $clearedString = preg_replace("/[^\\s\\w${chars}]/iu", '', $string);
@@ -108,14 +107,42 @@ class Transliteration
     }
 
     /**
+     * Транслитерация
+     * @return array
+     */
+    public static function getOldschoolMap()
+    {
+        return [
+            'ж' => 'zh', 'ч' => 'ch', 'щ' => 'shch', 'ш' => 'sh',
+            'ю' => 'yu', 'ё' => 'yo', 'я' => 'ya', 'э' => 'e',
+            'а' => 'a', 'б' => 'b', 'в' => 'v',
+            'г' => 'g', 'д' => 'd', 'е' => 'e', 'з' => 'z',
+            'и' => 'i', 'й' => 'y', 'к' => 'k', 'л' => 'l',
+            'м' => 'm', 'н' => 'n', 'о' => 'o', 'п' => 'p',
+            'р' => 'r', 'с' => 's', 'т' => 't', 'у' => 'u',
+            'ф' => 'f', 'х' => 'h', 'ц' => 'ts', 'ъ' => '\'',
+            'ь' => '\'', 'ы' => 'i',
+            'Ж' => 'ZH', 'Ч' => 'CH', 'Щ' => 'SHCH', 'Ш' => 'SH',
+            'Ю' => 'YU', 'Ё' => 'YO', 'Я' => 'YA', 'Э' => 'E',
+            'А' => 'A', 'Б' => 'B', 'В' => 'V',
+            'Г' => 'G', 'Д' => 'D', 'Е' => 'E', 'З' => 'Z',
+            'И' => 'I', 'Й' => 'Y', 'К' => 'K', 'Л' => 'L',
+            'М' => 'M', 'Н' => 'N', 'О' => 'O', 'П' => 'P',
+            'Р' => 'R', 'С' => 'S', 'Т' => 'T', 'У' => 'U',
+            'Ф' => 'F', 'Х' => 'H', 'Ц' => 'TS', 'Ъ' => '\'',
+            'Ь' => '\'', 'Ы' => 'I',
+        ];
+    }
+
+    /**
      * Pareses parameters array. Just for clearance.
      * @param array $parameters
      */
     private static function parseParameters(array $parameters)
     {
         if (isset($parameters['map'])) {
-            if (!in_array($parameters['map'], ['common', 'gost2000'])) {
-                throw new \InvalidArgumentException("The 'map' parameter must be either 'common' or 'gost2000'");
+            if (!in_array($parameters['map'], ['common', 'gost2000', 'oldschool'])) {
+                throw new \InvalidArgumentException("The 'map' parameter must be either 'common', 'gost2000' or 'oldschool'");
             }
 
             self::$map = $parameters['map'];
@@ -129,12 +156,13 @@ class Transliteration
             self::$type = $parameters['type'];
         }
 
-        if (isset($parameters['lowercase'])) {
-            if (!is_bool($parameters['lowercase'])) {
-                throw new \InvalidArgumentException("The 'lowercase' parameter must be boolean");
+        if (isset($parameters['transformate_text'])) {
+            if (!in_array($parameters['transformate_text'], ['uppercase', 'lowercase', 'ucfirst'])) {
+                throw new \InvalidArgumentException("The 'type' parameter must be one of 'uppercase', 'lowercase' or 'ucfirst'");
             }
 
-            self::$lowercase = $parameters['lowercase'];
+            self::$transformate_text = $parameters['transformate_text'];
+
         }
     }
 
@@ -147,8 +175,10 @@ class Transliteration
         if ('gost2000' === self::$map) {
             return self::getGost2000Map();
         }
-
-        return self::getCommonMap();
+        if ('common' === self::$map) {
+            return self::getCommonMap();
+        }
+        return  self::getOldschoolMap();
     }
 
     /**
@@ -164,10 +194,19 @@ class Transliteration
             $string = preg_replace('/\s+/', '-', $string);
         }
 
-        if (true === self::$lowercase) {
-            $string = strtolower($string);
-        }
+        switch(self::$transformate_text) {
+            case 'lowercase':
+                $string = strtolower($string);
+                break;
+            case 'uppercase':
+                $string = strtoupper($string);
+                break;
+            case 'ucfirst':
+                $ar = explode(" ", strtolower($string));
+                $string = implode(" ", array_map("ucfirst", $ar));
+                break;
 
+        }
         return $string;
     }
 }

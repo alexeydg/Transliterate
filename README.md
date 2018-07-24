@@ -4,6 +4,9 @@
 Умеет:
 * строку в url ```['type' => 'url']```
 * строку в имя файла ```['type' => 'filename']```
+* строку в нижний регистр ```['transformate_text' => 'lowercase']```
+* строку в верхний регистр ```['transformate_text' => 'uppercase']```
+* строку в нижний регистр, первая буква каждого слова в верхний регистр ```['transformate_text' => 'ucfirst']```
 
 ### Установка:
 ```
@@ -15,12 +18,12 @@ composer require alexeydg/transliterate
 
 'providers' => [
   //...
-  ElForastero\Transliterate\TransliterationServiceProvider::class,
+  alexeydg\Transliterate\TransliterationServiceProvider::class,
 ],
 
 'aliases' => [
   //...
-  'Transliterate' => ElForastero\Transliterate\TransliterationFacade::class,
+  'Transliterate' => alexeydg\Transliterate\TransliterationFacade::class,
 ],
 ```
 
@@ -51,7 +54,10 @@ $string = Transliterate::make($string, ['type' => 'url', 'lowercase' => true, 'm
   // 'url', 'filename' или 'text'. Первым заменяем пробелы на '-', вторым на '_'.
   // По дефолту 'text', который ничего не заменяет.
   
-  'lowercase' => true, // Преобразовать строку в нижний регистр.
+  'transformate_text' => 'lowercase', 
+  // Преобразовать строку в нижний регистр.
+  // по дефолту без преобразований, доступны преобразования 'lowercase', 'uppercase', 'ucfirst'
+  // 'ucfirst' все слова в строке преобразовывает к нижнему регистру, первую букву переводит в верхний регистр
   'map' => 'gost2000', // Транслитерация по ГОСТ 7.79-2000.
 ]
 ```
@@ -59,8 +65,11 @@ $string = Transliterate::make($string, ['type' => 'url', 'lowercase' => true, 'm
 ### Дополнительно
 ```php
 // Получить карту транслитерации, используемую по-умолчанию
-Transliteration::getDefaultMap();
+Transliteration::getOldschoolMap();
 
 // Карта по ГОСТ 2000
 Transliteration::getGost2000Map();
+
+//Транслитирация 
+Transliteration::getCommonMap();
 ```
