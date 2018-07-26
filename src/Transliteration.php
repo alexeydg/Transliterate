@@ -43,7 +43,7 @@ class Transliteration
         self::parseParameters($params);
         $map = self::getTransliterationMap();
         $chars = implode('', array_keys($map));
-        $clearedString = preg_replace("/[^\\s\\w${chars}]/iu", '', $string);
+        $clearedString = preg_replace("/[^\\s\\w${chars},\.\&\#\";\-]/iu", '', $string);
         $transliterated = str_replace(array_keys($map), array_values($map), $clearedString);
         return self::applyTransformer($transliterated);
     }
